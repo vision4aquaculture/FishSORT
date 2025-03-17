@@ -1,0 +1,65 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# RT-DETR-l object detection model with P3-P5 outputs. For details see https://docs.ultralytics.com/models/rtdetr
+
+# Parameters
+nc: 80  # number of classes
+scales: # model compound scaling constants, i.e. 'model=yolov8n-cls.yaml' will call yolov8-cls.yaml with scale 'n'
+  # [depth, width, max_channels]
+  l: [1.00, 1.00, 1024]
+
+# From BiliBili 魔鬼面具
+backbone:
+  - [-1, 1, HGStem, [16, 32]]  # 0-P2/4
+
+  - [0, 1, C2f, [32]] # 1-P2/4
+  - [-1, 1, Conv, [64, 3, 2]] # 2-P3/8
+  - [-1, 1, C2f, [64]] # 3-P3/8
+
+  - [0, 3, HGBlock, [16, 32, 3]] # 4-P2/4
+  - [-1, 1, DWConv, [64, 3, 2, 1, False]]  # 5-P3/8
+  - [-1, 3, HGBlock, [32, 64, 3]]   # 6-P3/8
+
+  - [[3, 6], 1, DynamicAlignFusion, [64]] # 7-P3/8
+
+  - [7, 1, Conv, [128, 3, 2]]  # 8-P4/16
+  - [-1, 1, C2f, [128]] # 9-P4/16
+
+  - [7, 1, DWConv, [128, 3, 2, 1, False]]  # 10-P4/16
+  - [-1, 3, HGBlock, [64, 128, 5, True, False]]  # cm, c2, k, light, shortcut
+  - [-1, 3, HGBlock, [64, 128, 5, True, True]]
+  - [-1, 3, HGBlock, [64, 128, 5, True, True]]  # 13-P4/16
+
+  - [[9, 13], 1, DynamicAlignFusion, [128]] # 14-P4/16
+
+  - [14, 1, Conv, [256, 3, 2]]  # 15-P5/32
+  - [-1, 3, C2f, [256]] # 16-P5/32
+
+  - [14, 1, DWConv, [256, 3, 2, 1, False]]  # 17-P5/32
+  - [-1, 3, HGBlock, [128, 256, 5, True, False]]  # 18-P5/32
+
+  - [[16, 18], 1, DynamicAlignFusion, [256]] # 19-P5/32
+head:
+  - [-1, 1, Conv, [256, 1, 1, None, 1, 1, False]]  # 20 input_proj.2
+  - [-1, 1, AIFI, [1024, 8]]
+  - [-1, 1, Conv, [256, 1, 1]]   # 22, Y5, lateral_convs.0
+
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]
+  - [14, 1, Conv, [256, 1, 1, None, 1, 1, False]]  # 24 input_proj.1
+  - [[-2, -1], 1, Concat, [1]]
+  - [-1, 3, RepC3, [256, 0.5]]  # 26, fpn_blocks.0
+  - [-1, 1, Conv, [256, 1, 1]]   # 27, Y4, lateral_convs.1
+
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]
+  - [7, 1, Conv, [256, 1, 1, None, 1, 1, False]]  # 29 input_proj.0
+  - [[-2, -1], 1, Concat, [1]]  # cat backbone P4
+  - [-1, 3, RepC3, [256, 0.5]]    # X3 (31), fpn_blocks.1
+
+  - [-1, 1, Conv, [256, 3, 2]]   # 32, downsample_convs.0
+  - [[-1, 27], 1, Concat, [1]]  # cat Y4
+  - [-1, 3, RepC3, [256, 0.5]]    # F4 (34), pan_blocks.0
+
+  - [-1, 1, Conv, [256, 3, 2]]   # 35, downsample_convs.1
+  - [[-1, 22], 1, Concat, [1]]  # cat Y5
+  - [-1, 3, RepC3, [256, 0.5]]    # F5 (37), pan_blocks.1
+
+  - [[31, 34, 37], 1, RTDETRDecoder, [nc, 256, 300, 4, 8, 3]]  # Detect(P3, P4, P5)

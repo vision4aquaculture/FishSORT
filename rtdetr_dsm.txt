@@ -1,0 +1,18 @@
+  0                  -1  1      1856  ultralytics.nn.modules.conv.Conv             [3, 64, 3, 2]
+  1                  -1  1     73984  ultralytics.nn.modules.conv.Conv             [64, 128, 3, 2]
+  2                  -1  1   1269940  ultralytics.nn.extra_modules.transformer.DSMAttention[128]
+  3                  -1  1    295424  ultralytics.nn.modules.conv.Conv             [128, 256, 3, 2]
+  4                  -1  1   1516212  ultralytics.nn.extra_modules.transformer.DSMAttention[256]
+  5                  -1  1   1180672  ultralytics.nn.modules.conv.Conv             [256, 512, 3, 2]
+  6                  -1  1   2500276  ultralytics.nn.extra_modules.transformer.DSMAttention[512]
+  7                  -1  1   2360320  ultralytics.nn.modules.conv.Conv             [512, 512, 3, 2]
+  8                  -1  3   7500828  ultralytics.nn.extra_modules.transformer.DSMAttention[512]
+    - [-1, 1, Conv, [64, 3, 2]]  # 0-P1/2
+  - [-1, 1, Conv, [128, 3, 2]]  # 1-P2/4
+  - [-1, 1, CSP_FreqSpatial, [128]]
+  - [-1, 1, Conv, [256, 3, 2]]  # 3-P3/8
+  - [-1, 1, CSP_FreqSpatial, [256]]
+  - [-1, 1, Conv, [384, 3, 2]]  # 5-P4/16
+  - [-1, 1, CSP_FreqSpatial, [384]]
+  - [-1, 1, Conv, [384, 3, 2]]  # 7-P5/32
+  - [-1, 3, CSP_FreqSpatial, [384]]

@@ -1,0 +1,9 @@
+# C extensions
+*.so
+
+logs/
+datasets/
+pretrained/
+YOLOX_outputs/
+runs/
+fast_reid/datasets/

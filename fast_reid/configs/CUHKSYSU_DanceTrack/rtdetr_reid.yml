@@ -1,0 +1,19 @@
+_BASE_: ../Base-SBS.yml
+
+MODEL:
+  META_ARCHITECTURE: RTDETR_line
+
+  BACKBONE:
+#    NORM: syncBN
+#    NAME: build_resnest_backbone
+    NAME: build_resnet_backbone
+    FOR_RTDETR: True
+    #from fastreid/modeling/backbones/resnest.py to fastreid/modeling/backbones/resnet.py
+#  HEADS:
+#    NORM: syncBNF
+
+DATASETS:
+  NAMES: ("CUHKSYSU_DanceTrack",)
+  TESTS: ("CUHKSYSU_DanceTrack",)
+
+OUTPUT_DIR: fast_reid/logs/CUHKSYSU_DanceTrack/sbs_S50

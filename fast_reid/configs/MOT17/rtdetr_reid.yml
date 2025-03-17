@@ -1,0 +1,9 @@
+_BASE_: ./sbs_R50.yml
+
+MODEL:
+  META_ARCHITECTURE: RTDETR_line
+
+  BACKBONE:
+    NAME: build_DSMANet_backbone
+
+OUTPUT_DIR: logs/mot17/RTDETR_line_DSMA_Net
